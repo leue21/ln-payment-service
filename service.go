@@ -62,19 +62,19 @@ func (s *PaymentService) createPayment(ir InvoiceRequest) (Invoice, error) {
 	req.Header.Add("Content-Type", "application/json")
 
 	r, err := s.client.Do(req)
-
+	empty := Invoice{}
 	if err != nil {
-		return Invoice{}, err
+		return empty, err
 	}
 	if r.StatusCode != http.StatusCreated {
-		return Invoice{}, fmt.Errorf("status code is not 201")
+		return empty, fmt.Errorf("status code is not 201")
 	}
 	defer closeBody(r.Request)
 	decoder := json.NewDecoder(r.Body)
 	var invoice Invoice
 	err = decoder.Decode(&invoice)
 	if err != nil {
-		return Invoice{}, err
+		return empty, err
 	}
 	return invoice, nil
 }
@@ -106,7 +106,7 @@ func (s *PaymentService) CheckPayment(checkingId string) ([]Payment, error) {
 }
 
 func (s *PaymentService) Paid(payment Payment) error {
-	fmt.Println("Payment received	")
+	fmt.Printf("Payment: %v\n", payment)
 	err := s.validatePayment(payment)
 	if err != nil {
 		return err

@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	_, _ = fmt.Fprintf(os.Stdout, "API_KEY=%s,  webhook=%s, walletId=%s, paymentUrl=%s", apiKey, webhook, walletId, paymentUrl)
+	fmt.Printf("API_KEY=%s,  webhook=%s, walletId=%s, paymentUrl=%s", apiKey, webhook, walletId, paymentUrl)
 	listenAndServe(paymentUrl, apiKey, walletId, webhook)
 }
 
