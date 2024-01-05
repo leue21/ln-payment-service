@@ -47,7 +47,6 @@ type QRCode struct {
 }
 
 func (qr *QRCode) Generate() ([]byte, error) {
-	fmt.Println("Generate")
 	qrCode, err := qrcode.Encode(qr.Content, qrcode.Medium, qr.Size)
 	if err != nil {
 		return nil, fmt.Errorf("could not generate a QR code: %v", err)
