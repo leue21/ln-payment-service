@@ -12,6 +12,7 @@ type Invoice struct {
 }
 
 type PaymentRequest struct {
+	Item     string `json:"item"`
 	Amount   int    `json:"amount"`
 	Currency string `json:"currency"`
 }
@@ -44,6 +45,12 @@ type Payment struct {
 type QRCode struct {
 	Size    int
 	Content string
+}
+
+type PaymentAction struct {
+	Action     string `json:"action"`
+	CheckingId string `json:"checking_id"`
+	Amount     int    `json:"amount"`
 }
 
 func (qr *QRCode) Generate() ([]byte, error) {

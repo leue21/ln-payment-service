@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/skip2/go-qrcode"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -14,6 +15,7 @@ type PaymentService struct {
 	apiKey     string
 	walletId   string
 	webhook    *url.URL
+	successUrl *url.URL
 	client     *http.Client
 }
 
@@ -36,10 +38,11 @@ func (s *PaymentService) CreateInvoice(pr PaymentRequest) (Invoice, error) {
 	if pr.Currency != "sat" {
 		return Invoice{}, fmt.Errorf("currency is not supported yet")
 	}
+	memo := fmt.Sprintf("Invoice for %s", pr.Item)
 	invoice, err := s.createPayment(InvoiceRequest{
 		Out:      false,
 		Amount:   pr.Amount,
-		Memo:     "Payment",
+		Memo:     memo,
 		Expiry:   3600,
 		Unit:     pr.Currency,
 		Webhook:  s.webhook.String(),
@@ -109,6 +112,24 @@ func (s *PaymentService) Paid(payment Payment) error {
 	fmt.Printf("Payment: %v\n", payment)
 	err := s.validatePayment(payment)
 	if err != nil {
+		return err
+	}
+	a := PaymentAction{
+		Action:     "blink",
+		CheckingId: payment.CheckingId,
+		Amount:     10,
+	}
+	jsonBody, err := json.Marshal(a)
+	if err != nil {
+		return err
+	}
+	req, err := http.NewRequest("POST", s.successUrl.String(), bytes.NewReader(jsonBody))
+	res, err := s.client.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		log.Fatal("status code is not 200")
 		return err
 	}
 	return nil

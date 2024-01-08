@@ -59,9 +59,15 @@ func (h *PaymentHandler) GeneratePayment(w http.ResponseWriter, r *http.Request)
 		WriteStatusWithMessageHandler(w, http.StatusBadRequest, "amount is not a number")
 		return
 	}
+	item := r.URL.Query().Get("item")
+	if item == "" {
+		WriteStatusWithMessageHandler(w, http.StatusBadRequest, "item is required")
+		return
+	}
 	invoice, err := h.p.CreateInvoice(PaymentRequest{
 		Amount:   s,
 		Currency: "sat",
+		Item:     item,
 	})
 	qr := QRCode{
 		Size:    256,
